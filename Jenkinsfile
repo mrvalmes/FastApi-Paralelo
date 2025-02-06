@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "http://localhost:8081/repository/mi-repo-docker/" // URL de Nexus
+        DOCKER_REGISTRY = "localhost:8081/repository/mi-repo-docker/" // URL de Nexus
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
         NEXUS_USER = credentials('NEXUS_CREDENTIALS')
         NEXUS_PASS = credentials('NEXUS_CREDENTIALS')
@@ -49,6 +49,7 @@ pipeline {
                 branch 'main'
             }
             steps {
+                sh "/var/jenkins_home/bin/doctl auth init --access-token $DO_API_TOKEN"
                 sh "/var/jenkins_home/bin/doctl apps update $APP_ID --spec $(pwd)/app.yaml"
             }
         }
