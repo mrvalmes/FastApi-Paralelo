@@ -49,10 +49,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh """
-                doctl auth init --access-token $DO_API_TOKEN
-                doctl apps update APP_ID --spec app.yaml
-                """
+                sh "/var/jenkins_home/bin/doctl apps update $APP_ID --spec app.yaml"
             }
         }
     }
