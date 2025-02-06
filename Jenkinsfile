@@ -2,18 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "https://bookstore-insured-fashion-can.trycloudflare.com"  // URL de Nexus
+        DOCKER_REGISTRY = "bookstore-insured-fashion-can.trycloudflare.com" // URL de Nexus
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
         NEXUS_USER = credentials('NEXUS_CREDENTIALS')
         NEXUS_PASS = credentials('NEXUS_CREDENTIALS')
         DO_API_TOKEN = credentials('DO_API_TOKEN')
-        APP_ID = "9f5eba95-5f38-4287-807b-e839e1e3358d"  // APP ID en Digital Ocean
+        APP_ID = "dop_v1_6ec489fed4377f1c81c82fefef844a14c1706e5b0046dbd39848e9bb798f398a"  // APP ID en Digital Ocean
     }
 
     stages {
         stage('Clonar Repositorio') {
             steps {
-                git branch: 'feature/nueva-funcionalidad', credentialsId: 'GIT_CREDENTIALS', url: 'git@github.com:tu-usuario/tu-repo.git'
+                git branch: 'feature/nueva-funcionalidad', credentialsId: 'GIT_CREDENTIALS', url: 'git@github.com:mrvalmes/FastApi-Paralelo.git'
             }
         }
 
@@ -38,9 +38,9 @@ pipeline {
             }
             steps {
                 sh """
-                docker login -u $NEXUS_USER -p $NEXUS_PASS $DOCKER_REGISTRY
-                docker tag $DOCKER_IMAGE:latest $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
-                docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
+                echo $NEXUS_PASS | docker login $DOCKER_REGISTRY -u $NEXUS_USER --password-stdin
+                docker tag $DOCKER_IMAGE:latest $DOCKER_REGISTRY/mi-app-fastapi:latest
+                docker push $DOCKER_REGISTRY/mi-app-fastapi:latest
                 """
             }
         }
@@ -50,10 +50,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh """
-                doctl auth init --access-token $DO_API_TOKEN
-                doctl apps update $APP_ID --spec app.yaml
-                """
+                sh "/var/jenkins_home/bin/doctl apps update $APP_ID --spec $(pwd)/app.yaml"
             }
         }
     }
