@@ -50,7 +50,7 @@ pipeline {
             }
             steps {
                 sh "/var/jenkins_home/bin/doctl auth init --access-token $DO_API_TOKEN"
-                sh "/var/jenkins_home/bin/doctl apps update $APP_ID --spec $(pwd)/app.yaml"
+                sh "/var/jenkins_home/bin/doctl apps update ${APP_ID} --spec \$(pwd)/app.yaml"
             }
         }
     }
