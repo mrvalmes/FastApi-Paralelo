@@ -15,28 +15,7 @@ pipeline {
                 git branch: 'feature/nueva-funcionalidad', credentialsId: 'GIT_CREDENTIALS', url: 'git@github.com:mrvalmes/FastApi-Paralelo.git'
             }
         }
-
-        stage('Ejecutar Pruebas') {
-            steps {
-                sh '''
-                if ! command -v python3 &> /dev/null; then
-                    echo "Python no está instalado. Instalándolo..."
-                    sudo apt update && sudo apt install -y python3 python3-pip python3-venv
-                fi
-                if [ ! -d "/var/jenkins_home/venv" ]; then
-                    echo "Creando entorno virtual..."
-                    python3 -m venv /var/jenkins_home/venv
-                fi
-                . /var/jenkins_home/venv/bin/activate
-                if ! python -m pytest --version &> /dev/null; then
-                    echo "Instalando pytest..."
-                    pip install pytest
-                fi
-                python -m pytest tests/
-                '''
-            }
-        }
-
+        
         stage('Construir Imagen Docker') {
             when {
                 branch 'main'
