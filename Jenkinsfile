@@ -6,8 +6,7 @@ pipeline {
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
         NEXUS_USER = credentials('NEXUS_CREDENTIALS')
         NEXUS_PASS = credentials('NEXUS_CREDENTIALS')
-        DO_API_TOKEN = credentials('DO_API_TOKEN')
-        APP_ID = "dop_v1_6ec489fed4377f1c81c82fefef844a14c1706e5b0046dbd39848e9bb798f398a"  // APP ID en Digital Ocean
+        DO_API_TOKEN = credentials('DO_API_TOKEN')        
     }
 
     stages {
