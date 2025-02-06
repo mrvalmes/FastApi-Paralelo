@@ -18,7 +18,22 @@ pipeline {
 
         stage('Ejecutar Pruebas') {
             steps {
-                sh 'pytest tests/'  // Ejecuta pruebas antes de continuar
+                sh '''
+                if ! command -v python3 &> /dev/null; then
+                    echo "Python no está instalado. Instalándolo..."
+                    apt update && apt install -y python3 python3-pip python3-venv
+                fi
+                if [ ! -d "/var/jenkins_home/venv" ]; then
+                    echo "Creando entorno virtual..."
+                    python3 -m venv /var/jenkins_home/venv
+                fi
+                source /var/jenkins_home/venv/bin/activate
+                if ! python -m pytest --version &> /dev/null; then
+                    echo "Instalando pytest..."
+                    pip install pytest
+                fi
+                python -m pytest tests/
+                '''
             }
         }
 
