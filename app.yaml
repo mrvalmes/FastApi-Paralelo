@@ -1,11 +1,11 @@
 name: clownfish-app
-region: sfo
+region: 
 services:
   - name: fastapi2
     image:
-      registry_type: DOCKER_REGISTRY
+      registry_type: CONTAINER_REGISTRY
       registry: registry.digitalocean.com/appparalelo
-      repository: mi-app-fastapi
+      repository: mi-repo-docker/mi-app-fastapi
       tag: latest
     http_port: 80
     internal_ports:
