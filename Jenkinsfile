@@ -8,7 +8,7 @@ pipeline {
         NEXUS_PASS = credentials('NEXUS_CREDENTIALS')
         DO_API_TOKEN = credentials('DO_API_TOKEN') 
 		APP_ID = credentials('DO_APP_ID')		
-	 
+	
     }
 
     stages {
@@ -19,20 +19,19 @@ pipeline {
         }
         
         stage('Construir Imagen Docker') {
-				  
+			
             when { not { branch 'main' } }
-			 
+		
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:latest .'
+                bat 'docker build -t $DOCKER_IMAGE:latest .'
             }
         }
 
         stage('Subir Imagen a Nexus') {
-				  
             when { not { branch 'main' } }
-			 
+		
             steps {
-                sh """
+                bat """
                 docker login -u $NEXUS_USER -p $NEXUS_PASS $DOCKER_REGISTRY
                 docker tag $DOCKER_IMAGE:latest $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
                 docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
@@ -45,8 +44,8 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh "/var/jenkins_home/bin/doctl auth init --access-token $DO_API_TOKEN"
-                sh "/var/jenkins_home/bin/doctl apps update $APP_ID --spec \$(pwd)/app.yaml"
+                bat "/var/jenkins_home/bin/doctl auth init --access-token $DO_API_TOKEN"
+                bat "/var/jenkins_home/bin/doctl apps update $APP_ID --spec \$(pwd)/app.yaml"
             }
         }
     }
