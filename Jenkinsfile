@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     environment {        
+        DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS')
         DO_API_TOKEN = credentials('DO_API_TOKEN') 
-		APP_ID = credentials('DO_APP_ID')		
-	
+        APP_ID = credentials('DO_APP_ID')		
     }
 
     stages {
@@ -32,32 +32,36 @@ pipeline {
                 docker tag %DOCKER_IMAGE%:latest %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
                 docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
                 """
+            }
         }
-    }
+        
         stage('Subir Imagen a DOCR') {
-        steps {
-            // Autenticarse en DOCR (si aún no lo has hecho)
-            //bat 'doctl registry login'
-            bat 'docker login registry.digitalocean.com -u doctl --password %DO_API_TOKEN%'
-            
-            // Retaggear la imagen desde Nexus a DOCR
-            bat 'docker tag mi-repo-docker/mi-app-fastapi:latest registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
-            
-            // Hacer push a DOCR
-            bat 'docker push registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
+                }
+            }
+            steps {
+                // Autenticarse en DOCR con --password-stdin para mayor seguridad
+                bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
+                
+                // Retaggear la imagen desde Nexus a DOCR
+                bat 'docker tag mi-repo-docker/mi-app-fastapi:latest registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
+                
+                // Hacer push a DOCR
+                bat 'docker push registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
+            }
+        }    
+        
+        stage('Desplegar en Digital Ocean') {
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
+                }
+            }
+            steps {
+                bat "doctl apps update %APP_ID% --spec app.yaml"
+            }
         }
-    }    
-    stage('Desplegar en Digital Ocean') {
-    when {
-        expression {
-            // Imprime el valor para depurar: println "GIT_BRANCH: ${env.GIT_BRANCH}"
-            return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
-        }
-    }
-    steps {
-        //bat "doctl auth init --access-token %DO_API_TOKEN%"
-        bat "doctl apps update %APP_ID% --spec app.yaml"
-        }
-    }
     }
 }
