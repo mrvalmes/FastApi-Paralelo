@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "localhost:8082/repository" // URL de Nexus
+        DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
         NEXUS_USER = credentials('NEXUS_CREDENTIALS')
         NEXUS_PASS = credentials('NEXUS_CREDENTIALS')
