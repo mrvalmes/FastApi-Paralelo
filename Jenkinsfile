@@ -19,22 +19,19 @@ pipeline {
         }
         
         stage('Construir Imagen Docker') {
-			
             when { not { branch 'main' } }
-		
             steps {
-                bat 'docker build -t $DOCKER_IMAGE:latest .'
+                bat 'docker build -t %DOCKER_IMAGE%:latest .' 
             }
         }
 
         stage('Subir Imagen a Nexus') {
             when { not { branch 'main' } }
-		
             steps {
                 bat """
-                docker login -u $NEXUS_USER -p $NEXUS_PASS $DOCKER_REGISTRY
-                docker tag $DOCKER_IMAGE:latest $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
-                docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
+                docker login -u %NEXUS_USER% -p %NEXUS_PASS% %DOCKER_REGISTRY%
+                docker tag %DOCKER_IMAGE%:latest %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
+                docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
                 """
             }
         }
@@ -44,8 +41,8 @@ pipeline {
                 branch 'main'
             }
             steps {
-                bat "/var/jenkins_home/bin/doctl auth init --access-token $DO_API_TOKEN"
-                bat "/var/jenkins_home/bin/doctl apps update $APP_ID --spec \$(pwd)/app.yaml"
+                bat "doctl auth init --access-token %DO_API_TOKEN%"
+                bat "doctl apps update %APP_ID% --spec app.yaml"
             }
         }
     }
