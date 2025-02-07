@@ -3,7 +3,7 @@ region: "sfo"  # región de despliegue
 services:
   - name: "fastapi2"
     image:
-      registry: "localhost:8081/repository/mi-repo-docker"
+      registry: "localhost:8083/repository/mi-repo-docker"
       repository: "mi-repo-docker/mi-app-fastapi"
       tag: "latest"
     http_port: 80
