@@ -55,6 +55,6 @@ pipeline {
                 bat "doctl auth init --access-token %DO_API_TOKEN%"
                 bat "doctl apps update %APP_ID% --spec app.yaml"
             }
-        }
-    }*/
+        }*/
+    }
 }
