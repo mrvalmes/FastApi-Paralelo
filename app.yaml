@@ -4,8 +4,8 @@ services:
   - name: fastapi2
     image:
       registry_type: DOCKER_REGISTRY
-      registry: localhost:8083/repository/mi-repo-docker
-      repository: mi-repo-docker/mi-app-fastapi
+      registry: registry.digitalocean.com/appparalelo
+      repository: mi-app-fastapi
       tag: latest
     http_port: 80
     internal_ports:
