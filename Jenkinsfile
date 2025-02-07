@@ -36,16 +36,18 @@ pipeline {
         }
 
         stage('Transferir Imagen a DOCR') {
-            when { not { branch 'main' } }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'DO_REGISTRY_CREDENTIALS', usernameVariable: 'DO_USERNAME', passwordVariable: 'DO_PASSWORD')]) {
-                    bat "docker login ${DO_REGISTRY} -u ${DO_USERNAME} -p ${DO_PASSWORD}" // Autenticación en DOCR
-                    bat "docker pull ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest" // Descarga desde Nexus
-                    bat "docker tag ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest ${DO_REGISTRY}/${DOCKER_IMAGE}:latest" // Re-etiqueta para DOCR
-                    bat "docker push ${DO_REGISTRY}/${DOCKER_IMAGE}:latest" // Sube a DOCR
-                }
+        when { not { branch 'main' } }
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'DO_REGISTRY_CREDENTIALS', usernameVariable: 'DO_USERNAME', passwordVariable: 'DO_PASSWORD')]) {
+                sh """ // Usamos 'sh' para evitar la interpolación de Groovy
+                    docker login registry.digitalocean.com -u "\$DO_USERNAME" -p "\$DO_PASSWORD" // Escapamos las variables
+                    docker pull ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest
+                    docker tag ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest ${DO_REGISTRY}/${DOCKER_IMAGE}:latest
+                    docker push ${DO_REGISTRY}/${DOCKER_IMAGE}:latest
+                """
             }
         }
+    }
 
         stage('Desplegar en Digital Ocean') {
             when {
