@@ -35,7 +35,6 @@ pipeline {
         }
     }
         stage('Subir Imagen a DOCR') {
-            when { branch 'main' }
         steps {
             // Autenticarse en DOCR (si aún no lo has hecho)
             bat 'doctl registry login'
@@ -46,14 +45,18 @@ pipeline {
             // Hacer push a DOCR
             bat 'docker push registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
         }
-    }
-        stage('Desplegar en DigitalOcean') {
-            steps {
-                script {
-                    def response = bat(script: 'doctl apps update $APP_ID --spec .do/app.yaml', returnStdout: true).trim()
-                    echo "Respuesta de la actualización de la aplicación: ${response}"
-                }
-            }
+    }    
+    stage('Desplegar en Digital Ocean') {
+    when {
+        expression {
+            // Imprime el valor para depurar: println "GIT_BRANCH: ${env.GIT_BRANCH}"
+            return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
         }
+    }
+    steps {
+        //bat "doctl auth init --access-token %DO_API_TOKEN%"
+        bat "doctl apps update %APP_ID% --spec app.yaml"
+        }
+    }
     }
 }
