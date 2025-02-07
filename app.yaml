@@ -1,8 +1,9 @@
 name: "clownfish-app"  # Nombre de la aplicación
-region: "sfo"  # región de despliegue
+region: "sfo"         # Región de despliegue
 services:
   - name: "fastapi2"
     image:
+      registry_type: "REGISTRY"     # Indica que se trata de un registro personalizado
       registry: "localhost:8083/repository/mi-repo-docker"
       repository: "mi-repo-docker/mi-app-fastapi"
       tag: "latest"
