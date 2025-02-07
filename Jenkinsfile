@@ -1,13 +1,13 @@
 pipeline {
     agent any
 
-    environment {        
-        DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
-        DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
+    environment {
+        DO_API_TOKEN = credentials('DO_API_TOKEN') // Token con scopes registry:read,registry:write
+        APP_ID = credentials('DO_APP_ID')
+        DO_REGISTRY = "registry.digitalocean.com/appparalelo" //registro DOCR
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
-        NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS')
-        DO_API_TOKEN = credentials('DO_API_TOKEN') 
-        APP_ID = credentials('DO_APP_ID')		
+        NEXUS_REGISTRY = "localhost:8083" // URL de tu registro Nexus
+        NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS') // Credenciales para Nexus
     }
 
     stages {
@@ -16,43 +16,37 @@ pipeline {
                 git branch: 'feature/nueva-funcionalidad', credentialsId: 'GIT_CREDENTIALS', url: 'git@github.com:mrvalmes/FastApi-Paralelo.git'
             }
         }
-        
+
         stage('Construir Imagen Docker') {
             when { not { branch 'main' } }
             steps {
-                bat 'docker build -t %DOCKER_IMAGE%:latest .' 
+                bat "docker build -t ${DOCKER_IMAGE}:latest ." // Construye la imagen sin etiqueta de registro
             }
         }
 
         stage('Subir Imagen a Nexus') {
             when { not { branch 'main' } }
             steps {
-                bat """
-                echo %NEXUS_CREDENTIALS_PSW% | docker login -u %NEXUS_CREDENTIALS_USR% --password-stdin %DOCKER_REGISTRY%
-                docker tag %DOCKER_IMAGE%:latest %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
-                docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
-                """
-            }
-        }
-        
-        stage('Subir Imagen a DOCR') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
+                withCredentials([usernamePassword(credentialsId: 'NEXUS_CREDENTIALS', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    bat "docker login ${NEXUS_REGISTRY} -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
+                    bat "docker tag ${DOCKER_IMAGE}:latest ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest" // Etiqueta para Nexus
+                    bat "docker push ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest"
                 }
             }
+        }
+
+        stage('Transferir Imagen a DOCR') {
+            when { not { branch 'main' } }
             steps {
-                // Autenticarse en DOCR con --password-stdin para mayor seguridad
-                bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
-                
-                // Retaggear la imagen desde Nexus a DOCR
-                bat 'docker tag mi-repo-docker/mi-app-fastapi:latest registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
-                
-                // Hacer push a DOCR
-                bat 'docker push registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
+                withCredentials([usernamePassword(credentialsId: 'DO_REGISTRY_CREDENTIALS', usernameVariable: 'DO_USERNAME', passwordVariable: 'DO_PASSWORD')]) {
+                    bat "docker login ${DO_REGISTRY} -u ${DO_USERNAME} -p ${DO_PASSWORD}" // Autenticación en DOCR
+                    bat "docker pull ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest" // Descarga desde Nexus
+                    bat "docker tag ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest ${DO_REGISTRY}/${DOCKER_IMAGE}:latest" // Re-etiqueta para DOCR
+                    bat "docker push ${DO_REGISTRY}/${DOCKER_IMAGE}:latest" // Sube a DOCR
+                }
             }
-        }    
-        
+        }
+
         stage('Desplegar en Digital Ocean') {
             when {
                 expression {
@@ -60,6 +54,7 @@ pipeline {
                 }
             }
             steps {
+                bat "doctl auth init --access-token %DO_API_TOKEN%"
                 bat "doctl apps update %APP_ID% --spec app.yaml"
             }
         }
