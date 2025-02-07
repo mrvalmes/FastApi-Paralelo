@@ -4,8 +4,7 @@ pipeline {
     environment {
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
-        NEXUS_USER = credentials('NEXUS_CREDENTIALS')
-        NEXUS_PASS = credentials('NEXUS_CREDENTIALS')
+        NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS')
         DO_API_TOKEN = credentials('DO_API_TOKEN') 
 		APP_ID = credentials('DO_APP_ID')		
 	
@@ -29,12 +28,12 @@ pipeline {
             when { not { branch 'main' } }
             steps {
                 bat """
-                docker login -u %NEXUS_USER% -p %NEXUS_PASS% %DOCKER_REGISTRY%
+                echo %NEXUS_CREDENTIALS_PSW% | docker login -u %NEXUS_CREDENTIALS_USR% --password-stdin %DOCKER_REGISTRY%
                 docker tag %DOCKER_IMAGE%:latest %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
                 docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest
                 """
-            }
         }
+    }
 
         stage('Desplegar en Digital Ocean') {
             when {
