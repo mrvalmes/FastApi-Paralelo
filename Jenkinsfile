@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    environment {
+    environment {        
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
         DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS')
@@ -37,7 +37,8 @@ pipeline {
         stage('Subir Imagen a DOCR') {
         steps {
             // Autenticarse en DOCR (si aún no lo has hecho)
-            bat 'doctl registry login'
+            //bat 'doctl registry login'
+            bat 'docker login registry.digitalocean.com -u doctl --password %DO_API_TOKEN%'
             
             // Retaggear la imagen desde Nexus a DOCR
             bat 'docker tag mi-repo-docker/mi-app-fastapi:latest registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
