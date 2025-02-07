@@ -34,8 +34,20 @@ pipeline {
                 """
         }
     }
+    stage('Desplegar en Digital Ocean') {
+    when {
+        expression {
+            // Imprime el valor para depurar: println "GIT_BRANCH: ${env.GIT_BRANCH}"
+            return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
+        }
+    }
+    steps {
+        bat "doctl auth init --access-token %DO_API_TOKEN%"
+        bat "doctl apps update %APP_ID% --spec app.yaml"
+        }
+    }
 
-        stage('Desplegar en Digital Ocean') {
+    /*  stage('Desplegar en Digital Ocean') {
             when {
                 branch 'main'
             }
@@ -44,5 +56,5 @@ pipeline {
                 bat "doctl apps update %APP_ID% --spec app.yaml"
             }
         }
-    }
+    }*/
 }
