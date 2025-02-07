@@ -50,7 +50,7 @@ pipeline {
         stage('Desplegar en DigitalOcean') {
             steps {
                 script {
-                    def response = sh(script: 'doctl apps update $APP_ID --spec .do/app.yaml', returnStdout: true).trim()
+                    def response = bat(script: 'doctl apps update $APP_ID --spec .do/app.yaml', returnStdout: true).trim()
                     echo "Respuesta de la actualización de la aplicación: ${response}"
                 }
             }
