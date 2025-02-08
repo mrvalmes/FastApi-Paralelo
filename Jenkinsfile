@@ -75,7 +75,7 @@ pipeline {
                 bat 'docker tag %DOCKER_IMAGE% registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
                 
                 // Hacer push a DOCR
-                bat 'docker push registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
+                bat 'docker push registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%'
                 
             }
         }    
