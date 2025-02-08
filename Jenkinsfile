@@ -39,7 +39,7 @@ pipeline {
         when { not { branch 'main' } }
         steps {
             withCredentials([usernamePassword(credentialsId: 'DO_REGISTRY_CREDENTIALS', usernameVariable: 'DO_USERNAME', passwordVariable: 'DO_PASSWORD')]) {
-                sh """ // Usamos 'sh' para evitar la interpolación de Groovy
+                bat """ // Usamos 'sh' para evitar la interpolación de Groovy
                     docker login registry.digitalocean.com -u "\$DO_USERNAME" -p "\$DO_PASSWORD" // Escapamos las variables
                     docker pull ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest
                     docker tag ${NEXUS_REGISTRY}/${DOCKER_IMAGE}:latest ${DO_REGISTRY}/${DOCKER_IMAGE}:latest
