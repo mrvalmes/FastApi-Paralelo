@@ -13,7 +13,7 @@ def create_task(task_id: int, background_tasks: BackgroundTasks):
 @app.get("/")
 def test_api():
     return {
-        "/": "Funcionando correctamente!"
+        "Activo": "Funcionando correctamente!"
         }
 
 if __name__ == "__main__":
