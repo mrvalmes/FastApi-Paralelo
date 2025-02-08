@@ -71,8 +71,9 @@ pipeline {
                 // Autenticarse en DOCR con --password-stdin para mayor seguridad
                 bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
                 
-                // Retaggear la imagen desde Nexus a DOCR
-                bat 'docker tag %DOCKER_IMAGE% registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
+                // Retaggear la imagen desde Nexus a DOCR                
+                bat "docker tag %DOCKER_IMAGE%:%DOCKER_TAG% registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%"
+
                 
                 // Hacer push a DOCR
                 bat 'docker push registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%'
