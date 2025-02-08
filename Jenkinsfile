@@ -76,7 +76,8 @@ pipeline {
 
                 
                 // Hacer push a DOCR
-                bat 'docker push registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%'
+                bat 'docker push registry.digitalocean.com/appparalelo/fastapi2:1.0.0'
+                //bat 'docker push registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
                 
             }
         }    
