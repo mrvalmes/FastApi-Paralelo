@@ -10,7 +10,7 @@ def send_push_notification(task_id: int):
     payload = {
         "app_id": ONESIGNAL_APP_ID,
         "included_segments": ["All"],
-        "contents": {"en": f"Tarea {task_id} completada"}
+        "contents": {"en": f"Tarea {task_id} completada Exitosamente!"},
     }
     headers = {
         "Content-Type": "application/json",
