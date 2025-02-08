@@ -72,7 +72,7 @@ pipeline {
                 bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
                 
                 // Retaggear la imagen desde Nexus a DOCR
-                bat 'docker tag fastapi2/%DOCKER_IMAGE% registry.digitalocean.com/appparalelo/Z%DOCKER_IMAGE%:%DOCKER_TAG%'
+                bat 'docker tag fastapi2/%DOCKER_IMAGE% registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
                 
                 // Hacer push a DOCR
                 bat 'docker push registry.digitalocean.com/appparalelo/%DOCKER_IMAGE%:%DOCKER_TAG% '
