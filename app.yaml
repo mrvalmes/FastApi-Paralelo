@@ -5,7 +5,7 @@ services:
     image:
       registry_type: CONTAINER_REGISTRY
       registry: registry.digitalocean.com/appparalelo
-      repository: mi-repo-docker/mi-app-fastapi
+      repository: fastapi2/fastapi2:1.0.0
       tag: latest
     http_port: 80
     internal_ports:
