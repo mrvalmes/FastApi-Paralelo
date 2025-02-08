@@ -1,10 +1,6 @@
 pipeline {
     agent any
-    triggers {
-        githubPush {
-            branch('main')
-        }
-    }
+        
     environment {        
         DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
@@ -13,7 +9,7 @@ pipeline {
         DO_API_TOKEN = credentials('DO_API_TOKEN') 
         APP_ID = credentials('DO_APP_ID')		
     }
-    
+
     stages {
         stage('Clonar Repositorio') {
             steps {
