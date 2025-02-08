@@ -70,6 +70,9 @@ pipeline {
             steps {
                 // Autenticarse en DOCR con --password-stdin para mayor seguridad
                 //bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
+
+                bat 'doctl registry login'
+                //bat 'docker login registry.digitalocean.com'
                 
                 echo "Retaggear la imagen....."
                 // Retaggear la imagen desde Nexus a DOCR                
