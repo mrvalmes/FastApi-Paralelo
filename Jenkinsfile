@@ -1,10 +1,10 @@
 pipeline {
     agent any
-        
+
     environment {        
         DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
-        DOCKER_IMAGE = "mi-repo-docker/mi-app-fastapi"
+        DOCKER_IMAGE = "fastapi2/1.0.1"
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS')
         DO_API_TOKEN = credentials('DO_API_TOKEN') 
         APP_ID = credentials('DO_APP_ID')		
@@ -46,10 +46,10 @@ pipeline {
                 bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
                 
                 // Retaggear la imagen desde Nexus a DOCR
-                bat 'docker tag mi-repo-docker/mi-app-fastapi:latest registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
+                bat 'docker tag mi-repo-docker/mi-app-fastapi:latest registry.digitalocean.com/appparalelo/fastapi2:1.0.0'
                 
                 // Hacer push a DOCR
-                bat 'docker push registry.digitalocean.com/appparalelo/mi-app-fastapi:latest'
+                bat 'docker push registry.digitalocean.com/appparalelo/fastapi2:1.0.0'
             }
         }    
         
