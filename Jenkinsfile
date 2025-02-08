@@ -5,7 +5,7 @@ pipeline {
         DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
         DOCKER_IMAGE = "fastapi2"   // Nombre de la imagen
-        DOCKER_TAG = "1.1.0"    // Tag de la imagen
+        DOCKER_TAG = "1.0.0"    // Tag de la imagen
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS') // Credenciales de Nexus
         DO_API_TOKEN = credentials('DO_API_TOKEN')  // Token de Digital Ocean
         APP_ID = credentials('DO_APP_ID')  // ID de la aplicación en Digital Ocean
@@ -71,16 +71,16 @@ pipeline {
                 // Autenticarse en DOCR con --password-stdin para mayor seguridad
                 //bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
 
-                bat 'doctl registry login'
+                //bat 'doctl registry login'
                 //bat 'docker login registry.digitalocean.com'
                 
                 echo "Retaggear la imagen....."
                 // Retaggear la imagen desde Nexus a DOCR                
-                bat "docker tag %DOCKER_IMAGE%:%DOCKER_TAG% registry.digitalocean.com/fastapi100/%DOCKER_IMAGE%:%DOCKER_TAG%"
+                bat "docker tag %DOCKER_IMAGE%:%DOCKER_TAG% registry.digitalocean.com/fastapiparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%"
 
                 echo "Publicando....."
                 // Hacer push a DOCR                
-                bat 'docker push registry.digitalocean.com/fastapi100/%DOCKER_IMAGE%:%DOCKER_TAG%'
+                bat 'docker push registry.digitalocean.com/fastapiparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
                 
             }
         } 
