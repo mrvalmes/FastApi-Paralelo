@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {        
-        DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
+        //DOCKER_CONFIG = "C:\\Users\\Spectre\\.docker" // Ruta donde se encuentra el archivo config.json
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
-        DOCKER_IMAGE = "fastapi2"   // Nombre de la imagen
-        DOCKER_TAG = "1.0.0"    // Tag de la imagen
+        //DOCKER_IMAGE = "fastapi"   // Nombre de la imagen
+        //DOCKER_TAG = "1.0.0"    // Tag de la imagen
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS') // Credenciales de Nexus
-        DO_API_TOKEN = credentials('DO_API_TOKEN')  // Token de Digital Ocean
-        APP_ID = credentials('DO_APP_ID')  // ID de la aplicación en Digital Ocean
+        //DO_API_TOKEN = credentials('DO_API_TOKEN')  // Token de Digital Ocean
+        //APP_ID = credentials('DO_APP_ID')  // ID de la aplicación en Digital Ocean
     }       
 
     stages {
@@ -45,7 +45,7 @@ pipeline {
             when { not { branch 'main' } }
             steps {
                 echo "🔨 Construyendo imagen Docker..."
-                bat 'docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .' 
+                bat 'docker build -t fastapi:1.0.0 .' 
             }
         }
 
@@ -55,8 +55,8 @@ pipeline {
                 echo "🔨 Construyendo imagen Nexus.."
                 bat """
                 echo %NEXUS_CREDENTIALS_PSW% | docker login -u %NEXUS_CREDENTIALS_USR% --password-stdin %DOCKER_REGISTRY%
-                docker tag %DOCKER_IMAGE%:%DOCKER_TAG%  %DOCKER_REGISTRY%/%DOCKER_IMAGE%:%DOCKER_TAG%
-                docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:%DOCKER_TAG% 
+                docker tag fastapi:1.0.0  %DOCKER_REGISTRY%/fastapi:1.0.0
+                docker push %DOCKER_REGISTRY%/fastapi:1.0.0
                 """
             }
         }
@@ -67,20 +67,15 @@ pipeline {
                     return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
                 }
             }
-            steps {
-                // Autenticarse en DOCR con --password-stdin para mayor seguridad
-                //bat 'echo %DO_API_TOKEN% | docker login registry.digitalocean.com -u doctl --password-stdin'
-
-                //bat 'doctl registry login'
-                //bat 'docker login registry.digitalocean.com'
+            steps { 
                 
                 echo "Retaggear la imagen....."
                 // Retaggear la imagen desde Nexus a DOCR                
-                bat "docker tag %DOCKER_IMAGE%:%DOCKER_TAG% registry.digitalocean.com/fastapiparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%"
+                bat "docker tag fastapi:1.0.0 registry.digitalocean.com/fastapiparalelo/fastapi:1.0.0"
 
                 echo "Publicando....."
                 // Hacer push a DOCR                
-                bat 'docker push registry.digitalocean.com/fastapiparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
+                bat 'docker push registry.digitalocean.com/fastapiparalelo/fastapi:1.0.0'
                 
             }
         } 
