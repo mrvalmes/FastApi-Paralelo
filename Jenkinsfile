@@ -7,7 +7,7 @@ pipeline {
         //DOCKER_IMAGE = "fastapi"   // Nombre de la imagen
         //DOCKER_TAG = "1.0.0"    // Tag de la imagen
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS') // Credenciales de Nexus
-        //DO_API_TOKEN = credentials('DO_API_TOKEN')  // Token de Digital Ocean
+        DO_API_TOKEN = credentials('DO_API_TOKEN')  // Token de Digital Ocean
         //APP_ID = credentials('DO_APP_ID')  // ID de la aplicación en Digital Ocean
     }       
 
@@ -69,6 +69,10 @@ pipeline {
             }
             steps { 
                 
+                // iniciar sesión en Digital Ocean  
+                bat 'doctl auth init -t %DO_API_TOKEN%'
+                bat 'doctl registry login --never-expire'
+
                 echo "Retaggear la imagen....."
                 // Retaggear la imagen desde Nexus a DOCR                
                 bat "docker tag fastapi:1.0.0 registry.digitalocean.com/fastapiparalelo/fastapi:1.0.0"
