@@ -4,7 +4,7 @@ pipeline {
     environment { 
         DOCKER_REGISTRY = "localhost:8083" // URL de Nexus
         DOCKER_IMAGE = "fastapi"   // Nombre de la imagen
-        DOCKER_TAG = "1.0.0"    // Tag de la imagen
+        DOCKER_TAG = "1.0.1"    // Tag de la imagen
         NEXUS_CREDENTIALS = credentials('NEXUS_CREDENTIALS') // Credenciales de Nexus
         DO_API_TOKEN = credentials('DO_API_TOKEN')  // Token de Digital Ocean
     }       
@@ -58,7 +58,7 @@ pipeline {
             }
         }
         
-    /*stage('Deploy a DOCR') {
+    stage('Deploy a DOCR') {
             when {
                 expression {
                     return env.GIT_BRANCH == 'main' || env.GIT_BRANCH?.endsWith('/main')
@@ -79,6 +79,6 @@ pipeline {
                 bat 'docker push registry.digitalocean.com/fastapiparalelo/%DOCKER_IMAGE%:%DOCKER_TAG%'
                 
             }
-        } */
+        }
     }
 }
